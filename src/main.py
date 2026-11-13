@@ -1,14 +1,16 @@
 
-# PARKVISION
-# Sistema inteligente de estacionamiento
+from flask import Flask
 
-def main():
-    print("================================")
-    print("       PARKVISION")
-    print("================================")
-    print("Sistema de estacionamiento inteligente")
-    print("Iniciando programa...")
+app = Flask(__name__)
 
+@app.route("/")
+def inicio():
+    return """
+    <h1>Bienvenido a PARKVISION</h1>
+    <h2>Sistema inteligente de estacionamiento</h2>
+    <p>Servidor web funcionando correctamente.</p>
+    <p>Estacionamientos disponibles: 6</p>
+    """
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
