@@ -5,6 +5,7 @@
 from flask import Flask, render_template
 from pathlib import Path
 from deteccion import detectar_espacios
+from camara import iniciar_camara
 
 # Ubicar la carpeta templates del proyecto
 RUTA_PROYECTO = Path(__file__).resolve().parent.parent
@@ -29,6 +30,11 @@ def inicio():
         ocupados=ocupados,
         total=len(estados)
     )
+
+@app.route("/camara")
+def abrir_camara():
+    iniciar_camara()
+    return "La cámara se ha cerrado correctamente."
 
 if __name__ == "__main__":
     app.run(debug=True)
