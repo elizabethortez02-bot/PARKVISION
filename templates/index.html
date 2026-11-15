@@ -80,53 +80,31 @@
     <section class="resumen">
 <div class="tarjeta">
 <p>Espacios totales</p>
-<div class="numero">6</div>
-</div>
- 
+<div class="numero">{{ total }}</div>
+ </div>
         <div class="tarjeta">
 <p>Disponibles</p>
-<div class="numero">3</div>
+<div class="numero">{{ disponibles }}</div>
 </div>
  
         <div class="tarjeta">
 <p>Ocupados</p>
-<div class="numero">2</div>
+<div class="numero">{{ ocupados }}</div>
 </div>
 </section>
  
     <h2>Estado del estacionamiento</h2>
  
-    <section class="espacios">
-<div class="espacio libre">
-<h3>Espacio 01</h3>
-<p>Libre</p>
-</div>
- 
-        <div class="espacio ocupado">
-<h3>Espacio 02</h3>
-<p>Ocupado</p>
-</div>
- 
-        <div class="espacio libre">
-<h3>Espacio 03</h3>
-<p>Libre</p>
-</div>
- 
-        <div class="espacio ocupado">
-<h3>Espacio 04</h3>
-<p>Ocupado</p>
-</div>
- 
-        <div class="espacio libre">
-<h3>Espacio 05</h3>
-<p>Libre</p>
-</div>
- 
-        <div class="espacio reservado">
-<h3>Espacio 06</h3>
-<p>Reservado</p>
-</div>
+  
+<section class="espacios">
+    {% for ocupado in estados %}
+    <div class="espacio {{ 'ocupado' if ocupado else 'libre' }}">
+        <h3>Espacio {{ '%02d' | format(loop.index) }}</h3>
+        <p>{{ 'Ocupado' if ocupado else 'Libre' }}</p>
+    </div>
+    {% endfor %}
 </section>
+ 
 </main>
  
 </body>
