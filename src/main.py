@@ -4,6 +4,7 @@
 
 from flask import Flask, render_template
 from pathlib import Path
+from deteccion import detectar_espacios
 
 # Ubicar la carpeta templates del proyecto
 RUTA_PROYECTO = Path(__file__).resolve().parent.parent
@@ -16,8 +17,18 @@ app = Flask(
 
 @app.route("/")
 def inicio():
-    return render_template("index.html")
+    estados = detectar_espacios()
 
+    disponibles = estados.count(False)
+    ocupados = estados.count(True)
+
+    return render_template(
+        "index.html",
+        estados=estados,
+        disponibles=disponibles,
+        ocupados=ocupados,
+        total=len(estados)
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
