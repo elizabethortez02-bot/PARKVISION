@@ -4,7 +4,7 @@
 # Integracion: Xiomara
 
 import cv2
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from pathlib import Path
 
 from deteccion import clasificar_espacios
@@ -50,6 +50,44 @@ def inicio():
         porcentaje_ocupacion=estadisticas["porcentaje_ocupacion"],
         porcentaje_disponibilidad=estadisticas["porcentaje_disponibilidad"]
     )
+
+
+
+# API - ESTADO DE LOS ESTACIONAMIENTOS
+@app.route("/api/estado")
+def api_estado():
+
+    # Imagen de prueba (temporal)
+    ruta_imagen = RUTA_PROYECTO / "prueba.jpg"
+    imagen = cv2.imread(str(ruta_imagen))
+
+    if imagen is None:
+        return jsonify({
+            "error": "No se pudo cargar la imagen de prueba"
+        }), 500
+
+    try:
+        # Deteccion de los seis estacionamientos
+        estados = clasificar_espacios(imagen)
+
+        # Estadisticas del modulo de Erick
+        estadisticas = calcular_estadisticas(estados)
+
+        return jsonify({
+            "total": estadisticas["total"],
+            "disponibles": estadisticas["disponibles"],
+            "ocupados": estadisticas["ocupados"],
+            "porcentaje_ocupacion": estadisticas["porcentaje_ocupacion"],
+            "porcentaje_disponibilidad": estadisticas["porcentaje_disponibilidad"],
+            "estados": estados,
+            "fuente": "imagen_prueba"
+        })
+
+    except (ValueError, KeyError) as error:
+        app.logger.error("Error de deteccion: %s", error)
+        return jsonify({
+            "error": "No se pudieron calcular los estacionamientos"
+        }), 500
 
 
 # ABRIR CAMARA
