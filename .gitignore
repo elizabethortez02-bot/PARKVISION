@@ -5,3 +5,10 @@ __pycache__/
 venv/
 .env
 .vscode/
+
+# Fotografias locales de prueba
+/pruebas_procesamiento/
+/imagen_procesada.jpg
+ 
+# Entorno virtual
+.venv/
