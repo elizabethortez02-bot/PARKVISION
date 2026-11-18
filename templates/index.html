@@ -1,44 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>PARKVISION Estacionamiento inteligente</title>
+
     <style>
         * {
             box-sizing: border-box;
         }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #0b1220;
             color: #f8fafc;
         }
+
         header {
             background: #111c2e;
             padding: 28px 20px;
             text-align: center;
             border-bottom: 1px solid #26364b;
         }
+
         header h1 {
             margin: 0;
             font-size: 34px;
             letter-spacing: 2px;
         }
+
         header p {
             color: #94a3b8;
             margin-bottom: 0;
         }
+
         main {
             max-width: 1100px;
             margin: 0 auto;
             padding: 25px 18px 50px;
         }
+
         h2 {
             margin-top: 35px;
             margin-bottom: 18px;
             font-size: 22px;
         }
+
         .etiqueta {
             display: inline-block;
             padding: 7px 12px;
@@ -48,11 +58,13 @@
             font-size: 12px;
             margin-top: 15px;
         }
+
         .resumen {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
         }
+
         .tarjeta {
             background: #19263b;
             border: 1px solid #304158;
@@ -60,20 +72,25 @@
             padding: 24px 15px;
             text-align: center;
         }
+
         .tarjeta p {
             color: #cbd5e1;
             margin: 0 0 12px;
         }
+
         .numero {
             font-size: 38px;
             font-weight: bold;
         }
+
         .verde {
             color: #86efac;
         }
+
         .rojo {
             color: #fda4af;
         }
+
         .porcentajes {
             background: #19263b;
             border: 1px solid #304158;
@@ -81,12 +98,14 @@
             padding: 24px;
             margin-top: 20px;
         }
+
         .fila-porcentaje {
             display: flex;
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 10px;
         }
+
         .barra {
             background: #334155;
             height: 12px;
@@ -94,53 +113,65 @@
             overflow: hidden;
             margin-bottom: 22px;
         }
+
         .progreso {
             height: 100%;
             border-radius: 20px;
         }
+
         .progreso-ocupacion {
             background: #fb7185;
         }
+
         .progreso-disponibilidad {
             background: #4ade80;
         }
+
         .espacios {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
         }
+
         .espacio {
             border-radius: 14px;
             padding: 25px 15px;
             text-align: center;
             border: 1px solid;
         }
+
         .espacio h3 {
             margin: 12px 0 8px;
         }
+
         .espacio p {
             margin: 0;
             font-weight: bold;
         }
+
         .espacio .icono {
             font-size: 34px;
         }
+
         .libre {
             background: #173d36;
             border-color: #287b62;
             color: #86efac;
         }
+
         .ocupado {
             background: #3f2632;
             border-color: #9b4557;
             color: #fda4af;
         }
+
         .nota {
             color: #94a3b8;
             line-height: 1.6;
             font-size: 14px;
             margin-top: 24px;
         }
+
         footer {
             text-align: center;
             padding: 22px;
@@ -148,31 +179,134 @@
             color: #94a3b8;
             font-size: 13px;
         }
+
+        .estado-sistema {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 20px;
+            background: #19263b;
+            border: 1px solid #304158;
+            border-radius: 14px;
+        }
+
+        .estado-sistema p {
+            margin: 8px 0 0;
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        #estado-conexion {
+            font-weight: bold;
+        }
+
+        .seccion-historial {
+            margin-top: 35px;
+        }
+ 
+        .panel-historial {
+            background: #19263b;
+            border: 1px solid #304158;
+            border-radius: 14px;
+            padding: 25px;
+        }
+ 
+        .panel-historial h3 {
+            margin-top: 0;
+        }
+ 
+        .panel-historial p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+ 
+        .grafica-pendiente {
+            min-height: 180px;
+            background: #111c2e;
+            border: 1px dashed #475569;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+ 
+        .grafica-pendiente span {
+            font-size: 45px;
+        }
+
+        .vista-camara {
+            margin-top: 35px;
+        }
+ 
+        .panel-camara {
+            background: #19263b;
+            border: 1px solid #304158;
+            border-radius: 14px;
+            padding: 30px;
+            text-align: center;
+        }
+ 
+        .camara-placeholder {
+            height: 220px;
+            background: #111c2e;
+            border: 1px dashed #475569;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+        }
+ 
+        .panel-camara p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+ 
+        .camara-estado {
+            display: inline-block;
+            background: #334155;
+            color: #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
         @media (max-width: 700px) {
             .resumen {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
+
             .tarjeta {
                 padding: 18px 6px;
             }
+
             .tarjeta p {
                 font-size: 12px;
             }
+
             .numero {
                 font-size: 28px;
             }
+
             .espacios {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
+
             .espacio {
                 padding: 20px 8px;
             }
+
             header h1 {
                 font-size: 28px;
             }
         }
+
         @media (max-width: 360px) {
             .resumen {
                 grid-template-columns: 1fr;
@@ -180,78 +314,228 @@
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>PARKVISION</h1>
-    <p>Sistema inteligente de estacionamiento</p>
-    <span class="etiqueta">Prototipo en desarrollo</span>
-</header>
+    <header>
+        <h1>PARKVISION</h1>
+        <p>Sistema inteligente de estacionamiento</p>
+        <span class="etiqueta">Prototipo en desarrollo</span>
+    </header>
 
-<main>
-    <h2>Panel de disponibilidad</h2>
+    <main>
+        <section class="estado-sistema">
+            <div>
+                <span id="estado-conexion" role="status">
+                    Verificando conexión...
+                </span>
 
-    <section class="resumen">
-        <div class="tarjeta">
-            <p>Espacios totales</p>
-            <div class="numero">{{ total }}</div>
-        </div>
+                <p id="ultima-actualizacion">
+                    Última actualización: pendiente
+                </p>
 
-        <div class="tarjeta">
-            <p>Disponibles</p>
-            <div class="numero verde">{{ disponibles }}</div>
-        </div>
+                <p id="fuente-datos">
+                    Fuente: verificando...
+                </p>
+            </div>
 
-        <div class="tarjeta">
-            <p>Ocupados</p>
-            <div class="numero rojo">{{ ocupados }}</div>
-        </div>
-    </section>
+            <button type="button" id="btn-actualizar">
+                Actualizar ahora
+            </button>
+        </section>
 
-    <h2>Estadisticas de ocupacion</h2>
+        <!-- Mensaje general de disponibilidad -->
+        <p id="mensaje-disponibilidad" role="status">
+            Consultando disponibilidad...
+        </p>
 
-    <section class="porcentajes">
-        <div class="fila-porcentaje">
-            <span>Ocupacion</span>
-            <strong>{{ "%.2f"|format(porcentaje_ocupacion) }}%</strong>
-        </div>
+        <h2>Panel de disponibilidad</h2>
 
-        <div class="barra">
-            <div class="progreso progreso-ocupacion" style="width: {{ porcentaje_ocupacion }}%;"></div>
-        </div>
+        <section class="resumen">
+            <div class="tarjeta">
+                <p>Espacios totales</p>
+                <div class="numero" id="total">
+                    {{ total }}
+                </div>
+            </div>
 
-        <div class="fila-porcentaje">
-            <span>Disponibilidad</span>
-            <strong>{{ "%.2f"|format(porcentaje_disponibilidad) }}%</strong>
-        </div>
+            <div class="tarjeta">
+                <p>Disponibles</p>
+                <div class="numero verde" id="disponibles">
+                    {{ disponibles }}
+                </div>
+            </div>
 
-        <div class="barra">
-            <div class="progreso progreso-disponibilidad" style="width: {{ porcentaje_disponibilidad }}%;"></div>
-        </div>
-    </section>
+            <div class="tarjeta">
+                <p>Ocupados</p>
+                <div class="numero rojo" id="ocupados">
+                    {{ ocupados }}
+                </div>
+            </div>
+        </section>
 
-    <h2>Estado de los estacionamientos</h2>
+        <h2>Estadísticas de ocupación</h2>
 
-    <section class="espacios">
-        {% for ocupado in estados %}
-        <div class="espacio {{ 'ocupado' if ocupado else 'libre' }}">
-            <div class="icono" aria-hidden="true">🚗</div>
-            <h3>Espacio {{ "%02d"|format(loop.index) }}</h3>
-            <p>{{ 'Ocupado' if ocupado else 'Libre' }}</p>
-        </div>
-        {% endfor %}
-    </section>
+        <section class="porcentajes">
+            <div class="fila-porcentaje">
+                <span>Ocupación</span>
+                <strong>
+                    {{ "%.2f"|format(porcentaje_ocupacion) }}%
+                </strong>
+            </div>
 
-    <p class="nota">
-        Los resultados mostrados corresponden a la imagen de prueba
-        del prototipo. La integracion de la camara en tiempo real
-        se encuentra en desarrollo.
-    </p>
-</main>
+            <div class="barra">
+                <div class="progreso progreso-ocupacion" style="width: {{ porcentaje_ocupacion }}%;"></div>
+            </div>
 
-<footer>
-    PARKVISION Proyecto Feria de Programacion 2026 - Universidad Gerardo Barrios
-</footer>
+            <div class="fila-porcentaje">
+                <span>Disponibilidad</span>
+                <strong id="porcentaje-disponibilidad">
+                    {{ "%.2f"|format(porcentaje_disponibilidad) }}%
+                </strong>
+            </div>
+
+            <div class="barra">
+                <div id="barra-disponibilidad" class="progreso progreso-disponibilidad" style="width: {{ porcentaje_disponibilidad }}%;"></div>
+            </div>
+        </section>
+
+        <h2>Estado de los estacionamientos</h2>
+
+        <section class="espacios">
+            {% for ocupado in estados %}
+            <div 
+                class="espacio {{ 'ocupado' if ocupado else 'libre' }}"
+                id="espacio-{{ loop.index }}">
+                <div class="icono" aria-hidden="true"></div>
+                <h3>
+                    Espacio {{ "%02d"|format(loop.index) }}
+                </h3>
+                <p>
+                    {{ 'Ocupado' if ocupado else 'Libre' }}
+                </p>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="seccion-historial">
+            <h2>Estadísticas históricas</h2>
+            <div class="panel-historial">
+                <h3>Ocupación de estacionamientos</h3>
+                <p>
+                    Próximamente se mostrarán gráficas de ocupación por horas y por días.
+                </p>
+                <div class="grafica-pendiente">
+                    <span> incorporar graficas </span>
+                    <p>Gráficas en desarrollo</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="vista-camara">
+            <h2>Monitoreo de cámara</h2>
+            <div class="panel-camara">
+                <div class="camara-placeholder">
+                    incorporar vista de la cámara
+                </div>
+                <h3>Vista de la maqueta</h3>
+                <p>
+                    La visualización de la cámara
+                    estará disponible cuando se
+                    complete su integración.
+                </p>
+                <span class="camara-estado">
+                    Vista previa no disponible
+                </span>
+            </div>
+        </section>
+
+        <p class="nota">
+            Los resultados mostrados corresponden a la imagen de prueba
+            del prototipo. La integración de la cámara en tiempo real
+            se encuentra en desarrollo.
+        </p>
+    </main>
+
+    <footer>
+        PARKVISION Proyecto Feria de Programación 2026 - Universidad Gerardo Barrios
+    </footer>
+
+    <script>
+        const API_ESTADO = "/api/estado";
+        const INTERVALO = 3000;
+
+        let consultando = false;
+
+        const botonActualizar = document.getElementById("btn-actualizar");
+        const estadoConexion = document.getElementById("estado-conexion");
+        const ultimaActualizacion = document.getElementById("ultima-actualizacion");
+        const fuenteDatos = document.getElementById("fuente-datos");
+        const mensajeDisponibilidad = document.getElementById("mensaje-disponibilidad");
+
+        async function consultarEstado() {
+            if (consultando) return;
+            consultando = true;
+
+            try {
+                const respuesta = await fetch(API_ESTADO);
+                if (!respuesta.ok) throw new Error("Error en la respuesta de la red");
+                const datos = await respuesta.json();
+
+                document.getElementById("total").textContent = datos.total;
+                document.getElementById("disponibles").textContent = datos.disponibles;
+                document.getElementById("ocupados").textContent = datos.ocupados;
+
+                const porcentajeOcupacion = datos.porcentaje_ocupacion.toFixed(2);
+                const porcentajeDisponibilidad = datos.porcentaje_disponibilidad.toFixed(2);
+
+                document.getElementById("porcentaje-disponibilidad").textContent = porcentajeDisponibilidad + "%";
+                document.getElementById("barra-disponibilidad").style.width = porcentajeDisponibilidad + "%";
+                
+                const barraOcupacion = document.querySelector(".progreso-ocupacion");
+                if (barraOcupacion) {
+                    barraOcupacion.style.width = porcentajeOcupacion + "%";
+                }
+
+                datos.estados.forEach((ocupado, index) => {
+                    const espacioEl = document.getElementById(`espacio-${index + 1}`);
+                    if (espacioEl) {
+                        const textoP = espacioEl.querySelector("p");
+                        if (ocupado) {
+                            espacioEl.className = "espacio ocupado";
+                            if (textoP) textoP.textContent = "Ocupado";
+                        } else {
+                            espacioEl.className = "espacio libre";
+                            if (textoP) textoP.textContent = "Libre";
+                        }
+                    }
+                });
+
+                estadoConexion.textContent = "Conectado";
+                estadoConexion.style.color = "#4ade80";
+                
+                const ahora = new Date().toLocaleTimeString();
+                ultimaActualizacion.textContent = "Última actualización: " + ahora;
+                fuenteDatos.textContent = "Fuente: " + datos.fuente;
+                mensajeDisponibilidad.textContent = datos.disponibles > 0 ? "Hay espacios disponibles en el estacionamiento." : "Estacionamiento completamente ocupado.";
+
+            } catch (error) {
+                console.error("Error al consultar el estado:", error);
+                estadoConexion.textContent = "Sin conexión";
+                estadoConexion.style.color = "#fda4af";
+            } finally {
+                consultando = false;
+            }
+        }
+
+        if (botonActualizar) {
+            botonActualizar.addEventListener("click", consultarEstado);
+        }
+
+        setInterval(consultarEstado, INTERVALO);
+
+        consultarEstado();
+    </script>
 
 </body>
 </html>

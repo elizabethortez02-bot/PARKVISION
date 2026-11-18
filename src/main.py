@@ -1,10 +1,7 @@
-
-# PARKVISION
 # Servidor web principal
-# Integracion: Xiomara
 
 import cv2
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from pathlib import Path
 
 from deteccion import clasificar_espacios
@@ -16,7 +13,6 @@ from estadisticas import calcular_estadisticas
 # Ubicar la carpeta principal del proyecto
 RUTA_PROYECTO = Path(__file__).resolve().parent.parent
 
-# Configurar Flask
 app = Flask(
     __name__,
     template_folder=str(RUTA_PROYECTO / "templates")
@@ -59,7 +55,29 @@ def abrir_camara():
     return "La camara se ha cerrado correctamente."
 
 
-# PROBAR PROCESAMIENTO DE CAMARA
+# API de Actualización automática
+@app.route('/api/estado')
+def api_estado():
+    ruta_imagen = RUTA_PROYECTO / "prueba.jpg"
+    imagen = cv2.imread(str(ruta_imagen))
+
+    if imagen is None:
+        return jsonify({"error": "No se pudo cargar prueba.jpg"}), 500
+
+    estados = clasificar_espacios(imagen)
+    estadisticas = calcular_estadisticas(estados)
+
+    return jsonify({
+        "total": estadisticas["total"],
+        "disponibles": estadisticas["disponibles"],
+        "ocupados": estadisticas["ocupados"],
+        "porcentaje_ocupacion": estadisticas["porcentaje_ocupacion"],
+        "porcentaje_disponibilidad": estadisticas["porcentaje_disponibilidad"],
+        "estados": estados,
+        "fuente": "prueba"
+    })
+
+
 def probar_procesamiento_camara():
 
     camara = cv2.VideoCapture(0)

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+ 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+ 
+    <title>PARKVISION - Administración</title>
+ 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+ 
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1220;
+            color: #f8fafc;
+        }
+ 
+        header {
+            background: #111c2e;
+            padding: 30px 20px;
+            text-align: center;
+        }
+ 
+        header h1 {
+            margin: 0;
+        }
+ 
+        header p {
+            color: #94a3b8;
+        }
+ 
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 25px 18px;
+        }
+ 
+        .aviso {
+            background: #19263b;
+            border: 1px solid #304158;
+            padding: 16px;
+            border-radius: 12px;
+            color: #cbd5e1;
+        }
+ 
+        .paneles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 25px;
+        }
+ 
+        .panel {
+            background: #19263b;
+            border: 1px solid #304158;
+            padding: 25px;
+            border-radius: 14px;
+        }
+ 
+        .panel h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+ 
+        .panel p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+ 
+        .pendiente {
+            color: #fbbf24;
+            font-weight: bold;
+        }
+ 
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+        }
+ 
+        @media (max-width: 700px) {
+            .paneles {
+                grid-template-columns: 1fr;
+            }
+        }
+</style>
+</head>
+ 
+<body>
+ 
+<header>
+<h1>PARKVISION</h1>
+<p>Panel administrativo - Prototipo</p>
+</header>
+ 
+<main>
+ 
+    <div class="aviso">
+        Esta pantalla es una propuesta visual.
+        Las funciones administrativas todavía
+        no están conectadas al servidor.
+</div>
+ 
+    <section class="paneles">
+ 
+        <div class="panel">
+<h2>Estado del sistema</h2>
+<p class="pendiente">Pendiente de integración</p>
+<p>
+                Aquí se mostrará el estado
+                general de PARKVISION.
+</p>
+</div>
+ 
+        <div class="panel">
+<h2>Cámara</h2>
+<p class="pendiente">Pendiente de integración</p>
+<p>
+                Aquí se mostrará el estado
+                de conexión de la cámara.
+</p>
+</div>
+ 
+        <div class="panel">
+<h2>Estadísticas</h2>
+<p class="pendiente">Pendiente de integración</p>
+<p>
+                Aquí se podrán consultar
+                estadísticas históricas.
+</p>
+</div>
+ 
+        <div class="panel">
+<h2>Configuración</h2>
+<p class="pendiente">Pendiente de integración</p>
+<p>
+                Aquí se podrán configurar
+                las zonas de estacionamiento.
+</p>
+</div>
+ 
+    </section>
+ 
+</main>
+ 
+<footer>
+    PARKVISION - Universidad Gerardo Barrios
+</footer>
+ 
+</body>
+</html>
