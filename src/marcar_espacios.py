@@ -5,12 +5,16 @@
 import cv2
 from pathlib import Path
 
-RUTA = Path(__file__).resolve().parent.parent / "prueba.jpg"
+RUTA = (
+    Path(__file__).resolve().parent.parent
+    / "calibracion_maqueta"
+    / "maqueta_vacia.jpg"
+)
 
 imagen = cv2.imread(str(RUTA))
 
 if imagen is None:
-    print("No se encontro prueba.jpg")
+    print(f"No se encontró la imagen: {RUTA}")
     raise SystemExit
 
 espacios = []
