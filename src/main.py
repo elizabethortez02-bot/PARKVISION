@@ -1,170 +1,259 @@
 
-# PARKVISION
-# Servidor web principal
+# PARKVISION - Servidor principal
 # Integracion: Xiomara
 
 import os
+import json
+import sqlite3
 from pathlib import Path
+from datetime import datetime
 
 import cv2
 from flask import Flask, render_template, jsonify
 
 from deteccion import clasificar_espacios
-from camara import iniciar_camara
-from procesamiento import procesar_imagen
+from deteccion_maqueta import clasificar_espacios_maqueta
+from camara import iniciar_camara, capturar_fotografia
 from estadisticas import calcular_estadisticas
 
 
-# UBICACION DEL PROYECTO
-RUTA_PROYECTO = Path(__file__).resolve().parent.parent
+BASE = Path(__file__).resolve().parent.parent
+CARPETA_MAQUETA = BASE / "calibracion_maqueta"
+CARPETA_DATOS = BASE / "datos"
+BASE_DATOS = CARPETA_DATOS / "parkvision.db"
 
-# FUENTE DE IMAGEN
-# "prueba" = utiliza prueba.jpg
-# "camara" = utiliza el modulo de Alejandro
-FUENTE_IMAGEN = os.getenv("PARKVISION_FUENTE", "prueba")
+FUENTE = os.getenv(
+    "PARKVISION_FUENTE", "maqueta"
+).strip().lower()
 
+INDICE_CAMARA = int(
+    os.getenv("PARKVISION_CAMARA_INDICE", "1")
+)
 
-# CONFIGURAR FLASK
 app = Flask(
     __name__,
-    template_folder=str(RUTA_PROYECTO / "templates")
+    template_folder=str(BASE / "templates"),
+    static_folder=str(BASE / "static")
 )
 
 
-# OBTENER IMAGEN SEGUN LA FUENTE
+# BASE DE DATOS
+
+def conectar_bd():
+    CARPETA_DATOS.mkdir(
+        parents=True, exist_ok=True
+    )
+    return sqlite3.connect(BASE_DATOS, timeout=10)
+
+
+def crear_tabla():
+    with conectar_bd() as conexion:
+        conexion.execute("""
+            CREATE TABLE IF NOT EXISTS historial (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha TEXT NOT NULL,
+                ocupados INTEGER NOT NULL,
+                disponibles INTEGER NOT NULL,
+                estados TEXT NOT NULL,
+                fuente TEXT NOT NULL
+            )
+        """)
+
+
+def guardar_historial(estados, estadisticas):
+    crear_tabla()
+
+    estados_json = json.dumps(estados)
+
+    with conectar_bd() as conexion:
+        ultimo = conexion.execute("""
+            SELECT estados, fuente
+            FROM historial
+            ORDER BY id DESC
+            LIMIT 1
+        """).fetchone()
+
+        # Guardar solamente cuando cambie el estado
+        if ultimo is not None:
+            if ultimo == (estados_json, FUENTE):
+                return
+
+        fecha = datetime.now().astimezone().isoformat(
+            timespec="seconds"
+        )
+
+        conexion.execute("""
+            INSERT INTO historial
+            (fecha, ocupados, disponibles, estados, fuente)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha,
+            estadisticas["ocupados"],
+            estadisticas["disponibles"],
+            estados_json,
+            FUENTE
+        ))
+
+
+# OBTENER FOTOGRAFIA
+
 def obtener_imagen():
 
-    if FUENTE_IMAGEN == "prueba":
+    if FUENTE == "prueba":
+        ruta = BASE / "prueba.jpg"
+        imagen = cv2.imread(str(ruta))
 
-        ruta_imagen = RUTA_PROYECTO / "prueba.jpg"
-        imagen = cv2.imread(str(ruta_imagen))
+    elif FUENTE == "maqueta":
 
-        if imagen is None:
-            raise RuntimeError("No se pudo cargar prueba.jpg")
+        # Permite cambiar fotografias durante las pruebas
+        ruta_actual = CARPETA_MAQUETA / "actual.jpg"
 
-        return imagen
-
-    elif FUENTE_IMAGEN == "camara":
-
-        # Modulo de Alejandro
-        from camara import capturar_fotografia
-
-        imagen = capturar_fotografia()
-
-        if imagen is None:
-            raise RuntimeError(
-                "No se pudo capturar la imagen de la camara"
+        if ruta_actual.exists():
+            ruta = ruta_actual
+        else:
+            ruta = (
+                CARPETA_MAQUETA /
+                "maqueta_validacion.jpg"
             )
 
-        return imagen
+        imagen = cv2.imread(str(ruta))
+
+    elif FUENTE == "camara":
+        imagen = capturar_fotografia(
+            indice=INDICE_CAMARA
+        )
 
     else:
         raise ValueError(
-            f"Fuente de imagen no reconocida: {FUENTE_IMAGEN}"
+            f"Fuente no reconocida: {FUENTE}"
         )
 
+    if imagen is None:
+        raise RuntimeError(
+            "No se pudo obtener la fotografia"
+        )
 
-# PAGINA PRINCIPAL - CONDUCTORES
+    return imagen
+
+
+# DETECCION Y ESTADISTICAS
+
+def obtener_estado():
+
+    imagen = obtener_imagen()
+
+    if FUENTE == "prueba":
+        estados = clasificar_espacios(imagen)
+    else:
+        estados = clasificar_espacios_maqueta(imagen)
+
+    estadisticas = calcular_estadisticas(estados)
+
+    return estados, estadisticas
+
+
+# PAGINA WEB
+
 @app.route("/")
 def inicio():
-
     try:
-        imagen = obtener_imagen()
+        estados, estadisticas = obtener_estado()
 
-        # Deteccion del modulo de David
-        estados = clasificar_espacios(imagen)
-
-        # Estadisticas del modulo de Erick
-        estadisticas = calcular_estadisticas(estados)
-
-        # Enviar datos a la pagina de Fernanda
         return render_template(
             "index.html",
             estados=estados,
-            disponibles=estadisticas["disponibles"],
-            ocupados=estadisticas["ocupados"],
-            total=estadisticas["total"],
-            porcentaje_ocupacion=estadisticas["porcentaje_ocupacion"],
-            porcentaje_disponibilidad=estadisticas["porcentaje_disponibilidad"]
+            **estadisticas
         )
 
-    except (ValueError, KeyError, RuntimeError) as error:
-        app.logger.error("Error en pagina principal: %s", error)
-        return "No se pudo obtener el estado del estacionamiento", 503
+    except (
+        ValueError, RuntimeError,
+        OSError, cv2.error, sqlite3.Error
+    ) as error:
+        app.logger.error("Error en inicio: %s", error)
+        return "No se pudo cargar PARKVISION", 503
 
 
-# API - ESTADO DE LOS ESTACIONAMIENTOS
+# API DE ESTADO ACTUAL
+
 @app.route("/api/estado")
 def api_estado():
-
     try:
-        # Obtener imagen configurada
-        imagen = obtener_imagen()
+        estados, estadisticas = obtener_estado()
 
-        # Detectar los seis espacios
-        estados = clasificar_espacios(imagen)
+        guardar_historial(estados, estadisticas)
 
-        # Calcular estadisticas
-        estadisticas = calcular_estadisticas(estados)
-
-        # Entregar resultados en JSON
         return jsonify({
-            "total": estadisticas["total"],
-            "disponibles": estadisticas["disponibles"],
-            "ocupados": estadisticas["ocupados"],
-            "porcentaje_ocupacion": estadisticas["porcentaje_ocupacion"],
-            "porcentaje_disponibilidad": estadisticas["porcentaje_disponibilidad"],
+            **estadisticas,
             "estados": estados,
-            "fuente": FUENTE_IMAGEN
+            "fuente": FUENTE
         })
 
-    except (ValueError, KeyError, RuntimeError) as error:
+    except (
+        ValueError, RuntimeError,
+        OSError, cv2.error, sqlite3.Error
+    ) as error:
         app.logger.error("Error en API: %s", error)
 
         return jsonify({
-            "error": "No se pudo obtener el estado de los estacionamientos"
+            "error": "No se pudo obtener el estado"
         }), 503
 
 
-# ABRIR CAMARA - FUNCION DE ALEJANDRO
+# API DE HISTORIAL
+
+@app.route("/api/historial")
+def api_historial():
+    try:
+        crear_tabla()
+
+        with conectar_bd() as conexion:
+            filas = conexion.execute("""
+                SELECT id, fecha, ocupados,
+                       disponibles, fuente
+                FROM historial
+                ORDER BY id DESC
+                LIMIT 100
+            """).fetchall()
+
+        registros = []
+
+        for fila in reversed(filas):
+            registros.append({
+                "id": fila[0],
+                "fecha": fila[1],
+                "ocupados": fila[2],
+                "disponibles": fila[3],
+                "fuente": fila[4]
+            })
+
+        return jsonify({
+            "total_registros": len(registros),
+            "historial": registros
+        })
+
+    except (OSError, sqlite3.Error) as error:
+        app.logger.error(
+            "Error consultando historial: %s", error
+        )
+        return jsonify({
+            "error": "No se pudo consultar el historial"
+        }), 503
+
+
+# CAMARA
+
 @app.route("/camara")
 def abrir_camara():
+    if FUENTE != "camara":
+        return "Activa primero el modo camara", 400
 
-    iniciar_camara()
-    return "La camara se ha cerrado correctamente."
-
-
-# PRUEBA DE PROCESAMIENTO DE CAMARA
-def probar_procesamiento_camara():
-
-    camara = cv2.VideoCapture(0)
-
-    if not camara.isOpened():
-        print("No se pudo abrir la camara.")
-        return
-
-    try:
-        while True:
-
-            correcto, imagen = camara.read()
-
-            if not correcto:
-                print("No se pudo capturar la imagen.")
-                break
-
-            procesada = procesar_imagen(imagen)
-
-            cv2.imshow("PARKVISION - Original", imagen)
-            cv2.imshow("PARKVISION - Procesada", procesada)
-
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
-
-    finally:
-        camara.release()
-        cv2.destroyAllWindows()
+    iniciar_camara(indice=INDICE_CAMARA)
+    return "Camara cerrada"
 
 
-# INICIAR SERVIDOR
 if __name__ == "__main__":
-    app.run(debug=True)
+    crear_tabla()
+    print("PARKVISION iniciado")
+    print("Fuente:", FUENTE)
+    print("Historial:", BASE_DATOS)
+    app.run(debug=True, use_reloader=False)

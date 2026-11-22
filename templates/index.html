@@ -178,8 +178,11 @@
             conexion.style.color = "#86efac";
             elemento("ultima-actualizacion").textContent =
                 "Última actualización: " + new Date().toLocaleTimeString("es-SV");
-            const fuentes = { prueba: "Imagen de prueba", camara: "Cámara" };
-            elemento("fuente-datos").textContent = "Fuente: " + (fuentes[datos.fuente] || "No identificada");
+            const fuentes = {
+            prueba: "Imagen de prueba",
+            maqueta: "Fotografía real de la maqueta",
+            camara: "Cámara en vivo"
+        };            elemento("fuente-datos").textContent = "Fuente: " + (fuentes[datos.fuente] || "No identificada");
             elemento("mensaje-disponibilidad").textContent =
                 datos.disponibles > 0
                     ? `Hay ${datos.disponibles} espacio(s) disponible(s).`
