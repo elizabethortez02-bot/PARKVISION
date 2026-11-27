@@ -3,3 +3,4 @@ opencv-python
 numpy
 Pillow
 Flask
+qrcode[pil]
