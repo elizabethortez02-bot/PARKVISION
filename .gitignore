@@ -12,3 +12,8 @@ venv/
  
 # Entorno virtual
 .venv/
+# Archivos locales de PARKVISION UNIVERSITY
+.venv/
+.env
+/datos/
+/calibracion_maqueta/actual.jpg
