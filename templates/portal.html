@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#101b30">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/static/portal.css">
+    <title>PARKVISION</title>
+</head>
+
+<body>
+    <header><a href="/" class="brand">P<span>ARKVISION</span><small>UNIVERSITY SMART PARKING</small></a>
+        <nav><a href="/">Conductor</a><a href="/admin">Administración</a><a href="/entrada">Pantalla pública</a></nav>
+        <button id="logout" hidden onclick="act('logout')">Salir</button>
+    </header>
+    <main>
+        <div id="notice" role="status"></div>
+        <section id="hero" aria-live="polite">
+            <h1>PARKVISION UNIVERSITY</h1>
+            <p>Conectando con el sistema de estacionamiento...</p>
+        </section>
+        <section id="map"></section>
+        <section id="auth"></section>
+        <section id="driver" hidden>
+            <div class="grid">
+                <article>
+                    <h2>Mis vehículos</h2>
+                    <form onsubmit="submitForm(event,'vehicle')"><input name="plate" placeholder="Placa" required><input
+                            name="model" placeholder="Marca y modelo"><button>Registrar vehículo</button></form>
+                    <div id="vehicles"></div>
+                </article>
+                <article>
+                    <h2>Reserva rápida</h2>
+                    <p>Reserva un cupo, no una ubicación. Presenta tu carnet al llegar.</p><select
+                        id="vid"></select><button
+                        onclick="act('reserve',{vid:document.getElementById(&quot;vid&quot;).value})">Reservar
+                        cupo</button><button class="secondary"
+                        onclick="act('queue',{vid:document.getElementById(&quot;vid&quot;).value})">Fila
+                        virtual</button>
+                    <div id="reservations"></div>
+                    <div id="queue"></div>
+                </article>
+            </div>
+            <article>
+                <h2>Mi vehículo e historial</h2>
+                <div id="visits"></div>
+            </article>
+            <article>
+                <h2>Reportar incidencia</h2>
+                <form onsubmit="submitForm(event,'report')"><input name="description" placeholder="Describe el problema"
+                        required><button>Enviar</button></form>
+            </article>
+        </section>
+        <section id="admin" hidden>
+            <div class="grid">
+                <article>
+                    <h2>Control de acceso</h2>
+                    <form id="accessForm" onsubmit="submitForm(event,'enter')"><input id="carnet" name="carnet"
+                            placeholder="Carnet U00001" required><button type="button" onclick="validateCard()">Validar
+                            carnet</button><label>Escanear desde foto<input type="file" id="cardPhoto" accept="image/*"
+                                onchange="readCard()"></label>
+                        <div id="identity"></div><input id="plate" name="plate" placeholder="Placa" required><input
+                            name="model" placeholder="Marca y modelo (opcional)"><button>Autorizar
+                            entrada</button><button type="button" class="secondary" onclick="issueQR()">Generar acceso
+                            digital</button>
+                    </form>
+                    <div id="qrPanel" hidden><img id="qrImage" width="200" alt="QR personal temporal">
+                        <p id="qrTimer"></p>
+                    </div>
+                    <p>Verifique el carnet y la placa antes de autorizar.</p>
+                </article>
+                <article>
+                    <h2>Monitoreo</h2><img id="camera" alt="Última imagen procesada" width="100%">
+                </article>
+            </div>
+            <article>
+                <h2>Estancias y salidas</h2>
+                <div id="allvisits"></div>
+            </article>
+            <div class="grid">
+                <article>
+                    <h2>Reservas</h2>
+                    <div id="allreservations"></div>
+                    <h2>Fila virtual</h2>
+                    <div id="allqueue"></div>
+                </article>
+                <article>
+                    <h2>Incidencias</h2>
+                    <div id="incidents"></div>
+                </article>
+            </div>
+            <article>
+                <h2>Reportes</h2>
+                <div id="reports"></div>
+                <div id="smart"></div><a class="button" href="/api/report.csv">Exportar CSV</a>
+                <div id="events"></div>
+            </article>
+            <article>
+                <h2>Usuarios</h2>
+                <div id="users"></div>
+            </article>
+            <article>
+                <h2>Configuración</h2>
+                <form onsubmit="submitForm(event,'settings')"><label>Límite de reservas<input type="number" name="limit"
+                            min="0" max="6" required></label><label>Minutos de reserva<input type="number"
+                            name="minutes" min="1" max="60" required></label><label>Centavos por hora (0 = gratis)<input
+                            type="number" name="rate" min="0" max="10000" required></label><button>Guardar
+                        reglas</button></form>
+            </article>
+        </section>
+    </main>
+    <footer>PARKVISION · Visión artificial y gestión de estacionamientos</footer>
+    <script src="/static/portal.js"></script>
+</body>
+
+</html>
